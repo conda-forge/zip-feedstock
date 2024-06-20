@@ -1,0 +1,54 @@
+diff -ruN zip30.orig/win32/makenoas.w32 zip30/win32/makenoas.w32
+--- zip30.orig/win32/makenoas.w32	2024-04-24 10:20:37.193548406 -0600
++++ zip30/win32/makenoas.w32	2024-04-24 12:16:57.124182263 -0600
+@@ -87,7 +87,7 @@
+ # by passing the -stub switch to the 32-bit linker to specify the 16-bit part.
+ 
+ LD=link -nologo
+-LDFLAGS=user32.lib advapi32.lib /OPT:NOWIN98 /INCREMENTAL:NO /PDB:$*.pdb $(EXTLIB)
++LDFLAGS=user32.lib advapi32.lib /INCREMENTAL:NO /PDB:$*.pdb $(EXTLIB)
+ SYMS=/DEBUG:full /DEBUGTYPE:CV
+ !IFDEF debug
+ LDFLAGS=$(LDFLAGS) $(SYMS)
+diff -ruN zip30.orig/zip.h zip30/zip.h
+--- zip30.orig/zip.h	2024-04-24 10:20:37.197548487 -0600
++++ zip30/zip.h	2024-04-24 10:27:46.414100485 -0600
+@@ -262,7 +262,7 @@
+ 
+ /* ASCII definitions for line terminators in text files: */
+ #define LF     10        /* '\n' on ASCII machines; must be 10 due to EBCDIC */
+-#define CR     13        /* '\r' on ASCII machines; must be 13 due to EBCDIC */
++#define INFOZIP_CR     13        /* '\r' on ASCII machines; must be 13 due to EBCDIC */
+ #define CTRLZ  26        /* DOS & OS/2 EOF marker (used in fileio.c, vms.c) */
+ 
+ /* return codes of password fetches (negative: user abort; positive: error) */
+diff -ruN zip30.orig/zipup.c zip30/zipup.c
+--- zip30.orig/zipup.c	2024-04-24 10:20:37.197548487 -0600
++++ zip30/zipup.c	2024-04-24 10:27:41.418165410 -0600
+@@ -1207,7 +1207,7 @@
+             char c;
+ 
+             if ((c = *b++) == '\n') {
+-               *buf++ = CR; *buf++ = LF; len++;
++               *buf++ = INFOZIP_CR; *buf++ = LF; len++;
+             } else {
+               *buf++ = (char)ascii[(uch)c];
+             }
+@@ -1217,7 +1217,7 @@
+ #endif /* EBCDIC */
+       {
+          do {
+-            if ((*buf++ = *b++) == '\n') *(buf-1) = CR, *buf++ = LF, len++;
++            if ((*buf++ = *b++) == '\n') *(buf-1) = INFOZIP_CR, *buf++ = LF, len++;
+          } while (--size != 0);
+       }
+       buf -= len;
+@@ -1257,7 +1257,7 @@
+ #endif /* EBCDIC */
+       {
+          do {
+-            if (( *buf++ = *b++) == CR && *b == LF) buf--, len--;
++            if (( *buf++ = *b++) == INFOZIP_CR && *b == LF) buf--, len--;
+          } while (--size != 0);
+       }
+       if (len == 0) {
