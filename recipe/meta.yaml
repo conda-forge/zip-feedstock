@@ -18,20 +18,21 @@ source:
   - url: https://downloads.sourceforge.net/infozip/zip{{ version.replace(".", "") }}.tar.gz
     sha256: f0e8bb1f9b7eb0b01285495a2699df3a4b766784c1765a8f1aeedf63c0806369
     patches:
-      - "{{ SRC_DIR }}/zip-3.0-currdir.patch"
-      - "{{ SRC_DIR }}/zip-3.0-exec-shield.patch"
-      - "{{ SRC_DIR }}/zip-3.0-format-security.patch"
-      - "{{ SRC_DIR }}/zipnote.patch"
+      # Here, we need single quotes because SRC_DIR on win has backslashes
+      - '{{ SRC_DIR }}/zip-3.0-currdir.patch'
+      - '{{ SRC_DIR }}/zip-3.0-exec-shield.patch'
+      - '{{ SRC_DIR }}/zip-3.0-format-security.patch'
+      - '{{ SRC_DIR }}/zipnote.patch'
+      - cr-define.patch  # [win]
 
 build:
-  number: 3
-  skip: True  # [win]
+  number: 4
 
 requirements:
   build:
     - {{ compiler('c') }}
-    - make
-    - sed
+    - make  # [unix]
+    - sed  # [unix]
 
 test:
   commands:
@@ -43,7 +44,7 @@ test:
 
 about:
   home: https://infozip.sourceforge.net
-  license: BSD-like
+  license: LicenseRef-Info-ZIP
   license_file: LICENSE
   summary: simple program for unzipping files
   dev_url: https://sourceforge.net/projects/infozip
@@ -53,3 +54,4 @@ extra:
     - msarahan
     - jerowe
     - bollwyvl
+    - zklaus
