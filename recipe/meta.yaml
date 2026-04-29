@@ -24,7 +24,7 @@ source:
       - "{{ SRC_DIR }}/zipnote.patch"
 
 build:
-  number: 3
+  number: 4
   skip: True  # [win]
 
 requirements:
@@ -43,7 +43,7 @@ test:
 
 about:
   home: https://infozip.sourceforge.net
-  license: BSD-like
+  license: Info-ZIP
   license_file: LICENSE
   summary: simple program for unzipping files
   dev_url: https://sourceforge.net/projects/infozip
