@@ -14,7 +14,15 @@ set -eux
 # Demoting the relevant GCC 14+ errors back to warnings both lets the
 # configure probes succeed (so the legacy fallbacks stay disabled) and keeps
 # the real compile lenient enough for zip 3.0's old C sources.
+# NOTE: unix/configure runs its feature probes as `$CC ...` *without*
+# appending $CFLAGS. If the lenience flags live only in CFLAGS, GCC 14+
+# rejects every probe (implicit-function-declaration is a hard error),
+# configure then activates its legacy fallbacks (-DZMEM, -DNO_STRCHR,
+# -DNO_RENAME, -DNO_MKTEMP, ...), and -DZMEM in particular pulls in the
+# K&R memset/memcpy/memcmp prototypes in zip.h which collide with glibc.
+# The flags must therefore be part of CC so the probes see them.
 LEGACY_C_FLAGS="-Wno-error=implicit-function-declaration -Wno-error=implicit-int -Wno-error=incompatible-pointer-types -Wno-error=int-conversion -Wno-error=builtin-declaration-mismatch"
+export CC="${CC} ${LEGACY_C_FLAGS}"
 export CFLAGS="${CFLAGS} ${LEGACY_C_FLAGS} -DLARGE_FILE_SUPPORT -DZIP64_SUPPORT"
 
 mkdir -p bzip2
