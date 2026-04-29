@@ -2,7 +2,7 @@
 
 package:
   name: zip
-  version: {{ version }}
+  version: "{{ version }}"
 
 source:
   # patches as applied in
@@ -30,6 +30,7 @@ build:
 requirements:
   build:
     - {{ compiler('c') }}
+    - {{ stdlib('c') }}
     - make
     - sed
 
