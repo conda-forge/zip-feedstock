@@ -2,7 +2,11 @@
 
 set -eux
 
-export CFLAGS="${CFLAGS} -DLARGE_FILE_SUPPORT -DZIP64_SUPPORT"
+# zip 3.0 has legacy K&R-style prototypes that conflict with modern glibc
+# headers (memset/memcpy/memcmp, strchr redefinition). GCC 14+ promoted these
+# to errors by default, so demote them back to warnings to keep the build
+# compatible with newer toolchains.
+export CFLAGS="${CFLAGS} -DLARGE_FILE_SUPPORT -DZIP64_SUPPORT -Wno-error=incompatible-pointer-types -Wno-error=implicit-function-declaration -Wno-error=builtin-declaration-mismatch"
 
 mkdir -p bzip2
 
