@@ -10,6 +10,12 @@ export CFLAGS="${CFLAGS} -DLARGE_FILE_SUPPORT -DZIP64_SUPPORT -Wno-error=incompa
 
 mkdir -p bzip2
 
+# zip 3.0's zip.h contains legacy prototype declarations for memset/memcpy/
+# memcmp that conflict with modern glibc's <string.h>. These are hard C type
+# errors (not suppressible via -W flags), so strip them out before building.
+sed -i '/^ *char \*memset OF((char \*, int, unsigned int));/d' zip.h
+sed -i '/^ *char \*memcpy OF((char \*, char \*, unsigned int));/d' zip.h
+sed -i '/^ *int memcmp OF((char \*, char \*, unsigned int));/d' zip.h
 # patch in default conda-forge compiler flags
 sed -i "s|^CFLAGS_NOOPT =|CFLAGS_NOOPT = $CFLAGS $CPPFLAGS |" unix/Makefile
 sed -i "s|^LFLAGS1=''|LFLAGS1='$LDFLAGS'|" unix/configure
