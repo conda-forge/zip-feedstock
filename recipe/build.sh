@@ -15,8 +15,7 @@ set -eux
 # configure probes succeed (so the legacy fallbacks stay disabled) and keeps
 # the real compile lenient enough for zip 3.0's old C sources.
 LEGACY_C_FLAGS="-Wno-error=implicit-function-declaration -Wno-error=implicit-int -Wno-error=incompatible-pointer-types -Wno-error=int-conversion -Wno-error=builtin-declaration-mismatch"
-export CC="${CC} ${LEGACY_C_FLAGS}"
-export CFLAGS="${CFLAGS} -DLARGE_FILE_SUPPORT -DZIP64_SUPPORT"
+export CFLAGS="${CFLAGS} ${LEGACY_C_FLAGS} -DLARGE_FILE_SUPPORT -DZIP64_SUPPORT"
 
 mkdir -p bzip2
 
