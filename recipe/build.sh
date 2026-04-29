@@ -2,20 +2,24 @@
 
 set -eux
 
-# zip 3.0 has legacy K&R-style prototypes that conflict with modern glibc
-# headers (memset/memcpy/memcmp, strchr redefinition). GCC 14+ promoted these
-# to errors by default, so demote them back to warnings to keep the build
-# compatible with newer toolchains.
-export CFLAGS="${CFLAGS} -DLARGE_FILE_SUPPORT -DZIP64_SUPPORT -Wno-error=incompatible-pointer-types -Wno-error=implicit-function-declaration -Wno-error=builtin-declaration-mismatch"
+# zip 3.0 is from 2008 and has many issues with modern toolchains:
+#  * K&R-style function definitions (fileio.c memset/memcpy/memcmp when ZMEM
+#    is set) that conflict with glibc prototypes.
+#  * unix/configure probes for libc functions by compiling tiny programs
+#    without the corresponding headers. Under GCC 14+, implicit function
+#    declarations are errors by default, so every probe fails and configure
+#    activates legacy fallbacks (-DZMEM, -DNO_STRCHR, ...), which in turn
+#    produce the conflicting definitions that actually break the build.
+#
+# Demoting the relevant GCC 14+ errors back to warnings both lets the
+# configure probes succeed (so the legacy fallbacks stay disabled) and keeps
+# the real compile lenient enough for zip 3.0's old C sources.
+LEGACY_C_FLAGS="-Wno-error=implicit-function-declaration -Wno-error=implicit-int -Wno-error=incompatible-pointer-types -Wno-error=int-conversion -Wno-error=builtin-declaration-mismatch"
+export CC="${CC} ${LEGACY_C_FLAGS}"
+export CFLAGS="${CFLAGS} -DLARGE_FILE_SUPPORT -DZIP64_SUPPORT"
 
 mkdir -p bzip2
 
-# zip 3.0's zip.h contains legacy prototype declarations for memset/memcpy/
-# memcmp that conflict with modern glibc's <string.h>. These are hard C type
-# errors (not suppressible via -W flags), so strip them out before building.
-sed -i '/^ *char \*memset OF((char \*, int, unsigned int));/d' zip.h
-sed -i '/^ *char \*memcpy OF((char \*, char \*, unsigned int));/d' zip.h
-sed -i '/^ *int memcmp OF((char \*, char \*, unsigned int));/d' zip.h
 # patch in default conda-forge compiler flags
 sed -i "s|^CFLAGS_NOOPT =|CFLAGS_NOOPT = $CFLAGS $CPPFLAGS |" unix/Makefile
 sed -i "s|^LFLAGS1=''|LFLAGS1='$LDFLAGS'|" unix/configure
