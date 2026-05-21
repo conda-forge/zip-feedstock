@@ -2,7 +2,7 @@
 
 package:
   name: zip
-  version: {{ version }}
+  version: "{{ version }}"
 
 source:
   # patches as applied in
@@ -24,12 +24,13 @@ source:
       - "{{ SRC_DIR }}/zipnote.patch"
 
 build:
-  number: 3
+  number: 4
   skip: True  # [win]
 
 requirements:
   build:
     - {{ compiler('c') }}
+    - {{ stdlib('c') }}
     - make
     - sed
 
@@ -43,7 +44,7 @@ test:
 
 about:
   home: https://infozip.sourceforge.net
-  license: BSD-like
+  license: Info-ZIP
   license_file: LICENSE
   summary: simple program for unzipping files
   dev_url: https://sourceforge.net/projects/infozip
